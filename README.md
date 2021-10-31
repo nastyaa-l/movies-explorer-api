@@ -14,5 +14,6 @@
 `npm run dev` — запускает сервер с hot-reload
 
 ## Адрес домена
-api.movies-diplom.nomoredomains.work
+api.movies-diplom.nomoredomains.work,
+
 84.252.139.115
