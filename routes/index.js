@@ -1,32 +1,24 @@
 const { Router } = require('express');
-const { celebrate, Joi } = require('celebrate');
 const { login, createUser, logout } = require('../controllers/users');
-const auth = require('../middlewares/auth');
 const usersRouter = require('./users');
 const moviesRouter = require('./movies');
+const { validateLogin, validateUser } = require('../middlewares/validator');
+const NotFoundError = require('../errors/NotFoundError');
+const auth = require('../middlewares/auth');
 
 const router = Router();
 
-router.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().email(),
-    password: Joi.string().required().min(8),
-  }),
-}), login);
-
-router.post('/signup', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(6),
-    name: Joi.string(),
-  }),
-}), createUser);
+router.post('/signin', validateLogin, login);
+router.post('/signup', validateUser, createUser);
 
 router.use(auth);
-
 router.post('/signout', logout);
 
 router.use('/', usersRouter);
 router.use('/', moviesRouter);
+
+router.use(() => {
+  throw new NotFoundError('Запрашиваемый ресурс не найден');
+});
 
 module.exports = router;

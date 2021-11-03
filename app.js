@@ -1,29 +1,22 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
-const NotFoundError = require('./errors/NotFoundError');
 const apiRouter = require('./routes/index');
 const { errorLogger, requestLogger } = require('./middlewares/logger');
 const limiter = require('./config/rateLimiter');
 const errorHandler = require('./errors/ErrorHandler');
+const { PORT, DB_CONNECT } = require('./config/constatns');
 
 const app = express();
 
-const { PORT = 3000 } = process.env;
-
-mongoose.connect('mongodb://localhost:27017/bitfilmsdb');
+mongoose.connect(DB_CONNECT);
 
 app.use(express.json());
+app.use(requestLogger);
 app.use(helmet());
 app.use(limiter);
 
-app.use(requestLogger);
-
-app.use('/api', apiRouter);
-
-app.use(() => {
-  throw new NotFoundError('Запрашиваемый ресурс не найден');
-});
+app.use(apiRouter);
 
 app.use(errorLogger);
 

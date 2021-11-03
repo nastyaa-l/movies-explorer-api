@@ -14,7 +14,7 @@ const getMovies = (req, res, next) => {
 const createMovie = (req, res, next) => {
   const {
     country, director, duration, year,
-    description, image, trailer, nameRU, nameEN, thumbnail, movieId,
+    description, image, trailer, thumbnail, movieId,
   } = req.body;
   const owner = req.user._id;
   Movie.create({
@@ -25,8 +25,6 @@ const createMovie = (req, res, next) => {
     description,
     image,
     trailer,
-    nameRU,
-    nameEN,
     thumbnail,
     movieId,
     owner,
@@ -43,23 +41,21 @@ const createMovie = (req, res, next) => {
 };
 
 const deleteMovie = (req, res, next) => {
-  Movie.findByIdAndRemove(req.params.movieId)
+  Movie.findById(req.params.movieId)
     .then((movie) => {
       if (!movie) {
         throw new NotFoundError('Фильм с таким id не найдена');
       } else if (movie.owner.toString() === req.user._id.toString()) {
-        movie.remove();
-        res.status(200).send({ message: 'Фильм удален' });
-      } else {
-        throw new ForbiddenError('Недостаточно прав!');
+        return movie.remove()
+          .then(() => res.status(200).send({ message: 'Фильм удален' }));
       }
+      throw new ForbiddenError('Недостаточно прав!');
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadRequestError('Переданы некорректные данные');
-      } else {
-        next(err);
+        next(new BadRequestError('Переданы некорректные данные'));
       }
+      next(err);
     });
 };
 module.exports = {
