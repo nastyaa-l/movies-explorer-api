@@ -16,7 +16,7 @@ app.use(requestLogger);
 app.use(helmet());
 app.use(limiter);
 
-app.use(apiRouter);
+app.use('/api', apiRouter);
 
 app.use(errorLogger);
 
