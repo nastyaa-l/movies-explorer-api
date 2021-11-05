@@ -5,8 +5,6 @@ const {
 } = require('../controllers/movies');
 
 router.get('/movies', getMovies);
-
-router.post('/movies', createMovie);
 router.post('/movies', validateMovie, createMovie);
 router.delete('/movies/:movieId', validateMovieId, deleteMovie);
 

@@ -2,7 +2,6 @@ const Movie = require('../models/movie');
 
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
-const AuthError = require('../errors/AuthError');
 const ForbiddenError = require('../errors/ForbiddenError');
 
 const getMovies = (req, res, next) => {
@@ -12,30 +11,18 @@ const getMovies = (req, res, next) => {
 };
 
 const createMovie = (req, res, next) => {
-  const {
-    country, director, duration, year,
-    description, image, trailer, thumbnail, movieId,
-  } = req.body;
   const owner = req.user._id;
-  Movie.create({
-    country,
-    director,
-    duration,
-    year,
-    description,
-    image,
-    trailer,
-    thumbnail,
-    movieId,
-    owner,
-  })
-    .then((movie) => res.send({ data: movie }))
+  Movie.create({ owner, ...req.body })
+    .then((movie) => {
+      const data = movie;
+      data.owner = owner;
+      res.status(200).send(data);
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError(err.message);
-      } else {
-        throw new AuthError('Недостаточно прав!');
       }
+      next(err);
     })
     .catch(next);
 };
@@ -56,7 +43,8 @@ const deleteMovie = (req, res, next) => {
         next(new BadRequestError('Переданы некорректные данные'));
       }
       next(err);
-    });
+    })
+    .catch(next);
 };
 module.exports = {
   getMovies, createMovie, deleteMovie,

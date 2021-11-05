@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 
 const movieSchema = new mongoose.Schema({
   country: {
@@ -16,6 +17,8 @@ const movieSchema = new mongoose.Schema({
   year: {
     type: String,
     required: true,
+    minlength: 2,
+    maxlength: 4,
   },
   description: {
     type: String,
@@ -25,40 +28,45 @@ const movieSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: (v) => /^https?:\/\/(www\.)?([\w.]+?)\.([a-z]{2,6})([\w\d\-._~:/?#[\]@!$&'()*+,;=]*)#?$/.test(v),
-      message: (link) => `${link.value} - некорректная ссылка`,
+      validator(v) {
+        return validator.isURL(v);
+      },
     },
   },
   trailer: {
     type: String,
     required: true,
     validate: {
-      validator: (v) => /^https?:\/\/(www\.)?([\w.]+?)\.([a-z]{2,6})([\w\d\-._~:/?#[\]@!$&'()*+,;=]*)#?$/.test(v),
-      message: (link) => `${link.value} - некорректная ссылка`,
+      validator(v) {
+        return validator.isURL(v);
+      },
     },
   },
   thumbnail: {
     type: String,
     required: true,
     validate: {
-      validator: (v) => /^https?:\/\/(www\.)?([\w.]+?)\.([a-z]{2,6})([\w\d\-._~:/?#[\]@!$&'()*+,;=]*)#?$/.test(v),
-      message: (link) => `${link.value} - некорректная ссылка`,
+      validator(v) {
+        return validator.isURL(v);
+      },
     },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
     required: true,
+    select: true,
+    ref: 'user',
   },
   movieId: {
     type: Number,
     required: true,
+    unique: true,
   },
-  nameRu: {
+  nameRU: {
     type: String,
     required: true,
   },
-  nameEn: {
+  nameEN: {
     type: String,
     required: true,
   },

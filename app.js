@@ -6,6 +6,7 @@ const { errorLogger, requestLogger } = require('./middlewares/logger');
 const limiter = require('./config/rateLimiter');
 const errorHandler = require('./errors/ErrorHandler');
 const { PORT, DB_CONNECT } = require('./config/constatns');
+const clientErrorHandler = require('./middlewares/errorHandler');
 
 const app = express();
 
@@ -19,7 +20,7 @@ app.use(limiter);
 app.use('/api', apiRouter);
 
 app.use(errorLogger);
-
+app.use(clientErrorHandler);
 app.use(errorHandler);
 
 app.listen(PORT, () => {
